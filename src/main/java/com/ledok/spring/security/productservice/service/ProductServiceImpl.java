@@ -3,6 +3,7 @@ package com.ledok.spring.security.productservice.service;
 import com.ledok.spring.security.productservice.advice.ProductNotFoundException;
 import com.ledok.spring.security.productservice.controller.dto.ProductDto;
 import com.ledok.spring.security.productservice.controller.dto.ProductFilter;
+import com.ledok.spring.security.productservice.controller.dto.ProductStockReturnDto;
 import com.ledok.spring.security.productservice.controller.dto.ProductStockUpdateDto;
 import com.ledok.spring.security.productservice.jpa.entity.ProductEntity;
 import com.ledok.spring.security.productservice.jpa.repository.ProductRepository;
@@ -84,7 +85,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public ProductDto updateProduct(Long id, ProductDto productDto) {
-        if (productRepository.existsById(id)) {
+        if (!productRepository.existsById(id)) {
             throw new ProductNotFoundException("Продукт c ID: " + id + " не найден");
         }
         Optional<ProductEntity> product = productRepository.findById(id);
@@ -138,6 +139,37 @@ public class ProductServiceImpl implements ProductService {
             product.setStock(newStock);
         });
 
+        productRepository.saveAll(products.values());
+    }
+
+    @Override
+    @Transactional
+    public void returnProductsStock(List<ProductStockReturnDto> returns) {
+        // Получаем все ID продуктов
+        Set<Long> productIds = returns.stream()
+                .map(ProductStockReturnDto::getProductId)
+                .collect(Collectors.toSet());
+
+        // Получаем продукты
+        Map<Long, ProductEntity> products = productRepository.findAllById(productIds)
+                .stream()
+                .collect(Collectors.toMap(ProductEntity::getId, Function.identity()));
+
+        returns.forEach(update -> {
+                ProductEntity product = products.get(update.getProductId());
+        if (product == null) {
+            throw new ProductNotFoundException("Продукт c ID: " + update.getProductId() + " не найден");
+        }
+            if (update.getQuantityToAdd() <= 0) {
+                throw new IllegalArgumentException(
+                        "Некорректное количество для продукта " + update.getProductId() + ": " + update.getQuantityToAdd()
+                );
+            }
+
+        int newStock = product.getStock() + update.getQuantityToAdd();
+
+        product.setStock(newStock);
+    });
         productRepository.saveAll(products.values());
     }
 }

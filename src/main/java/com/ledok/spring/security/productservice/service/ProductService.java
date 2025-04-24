@@ -2,6 +2,7 @@ package com.ledok.spring.security.productservice.service;
 
 import com.ledok.spring.security.productservice.controller.dto.ProductDto;
 import com.ledok.spring.security.productservice.controller.dto.ProductFilter;
+import com.ledok.spring.security.productservice.controller.dto.ProductStockReturnDto;
 import com.ledok.spring.security.productservice.controller.dto.ProductStockUpdateDto;
 import com.ledok.spring.security.productservice.jpa.entity.ProductEntity;
 import org.springframework.data.domain.Page;
@@ -29,4 +30,6 @@ public interface ProductService {
     void deleteProduct(Long id);
 
     void updateProductsStock(List<ProductStockUpdateDto> updates);
+
+    void returnProductsStock(List<ProductStockReturnDto> returns);
 }

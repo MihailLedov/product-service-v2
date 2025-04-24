@@ -2,6 +2,7 @@ package com.ledok.spring.security.productservice.controller;
 
 import com.ledok.spring.security.productservice.controller.dto.ProductDto;
 import com.ledok.spring.security.productservice.controller.dto.ProductFilter;
+import com.ledok.spring.security.productservice.controller.dto.ProductStockReturnDto;
 import com.ledok.spring.security.productservice.controller.dto.ProductStockUpdateDto;
 import com.ledok.spring.security.productservice.jpa.entity.ProductEntity;
 import com.ledok.spring.security.productservice.service.ProductService;
@@ -69,5 +70,10 @@ public class ProductController {
     @PostMapping("/update-stock")
     void updateProductsStock(@RequestBody @Valid List<ProductStockUpdateDto> updates){
         productService.updateProductsStock(updates);
+    }
+
+    @PostMapping("/return-stock")
+    void returnProductsStock(@RequestBody @Valid List<ProductStockReturnDto> returns){
+        productService.returnProductsStock(returns);
     }
 }
